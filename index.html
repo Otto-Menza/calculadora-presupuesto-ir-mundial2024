@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="./style.css">
+    <title>Presupuesto mundial</title>
+</head>
+<body>
+    <h3 class="tittle-cal">Calculadora de Presupuesto</h3>
+    <div class="cont-tittles">
+        <p class="p-item">Concepto</p>
+        <p class="p-valor">Valor</p>
+    </div>
+    <div class="container">
+        <div class="input-container" id="input-container">
+            <div class="input-group">
+                <label for="entradas">Entrada al evento</label>
+                <input type="text" id="entradas" class="number-input" placeholder="0" oninput="formatNumber(this)">
+            </div>
+            <div class="input-group">
+                <label for="tiquetes">Tiquetes</label>
+                <input type="text" id="tiquetes" class="number-input" placeholder="0" oninput="formatNumber(this)">
+            </div>
+            <div class="input-group">
+                <label for="hotel">Hospedaje</label>
+                <input type="text" id="hotel" class="number-input" placeholder="0" oninput="formatNumber(this)">
+            </div>
+            <div class="input-group">
+                <label for="comida">Comida</label>
+                <input type="text" id="comida" class="number-input" placeholder="0" oninput="formatNumber(this)">
+            </div>
+            <div class="input-group">
+                <label for="trasnporte">Transporte</label>
+                <input type="text" id="transporte" class="number-input" placeholder="0" oninput="formatNumber(this)">
+            </div>
+            <div class="input-group">
+                <label for="turismo">Actividades turísticas</label>
+                <input type="text" id="turismo" class="number-input" placeholder="0" oninput="formatNumber(this)">
+            </div>
+            <div id="new-inputs-container"></div>
+        </div>
+        <div class="cont-new-input">
+            <button class="btn btn1" id="add-input">Añadir nuevo gasto</button>
+            <button class="btn btn-resert" id="reset-button">Nuevo presupuesto</button>
+        </div>
+        <div class="cont-calcular">
+            <button class="btn btn2" id="calculate-button">Calcular Presupuesto</button>
+            <div id="result">Total: $0</div>
+            <div class="cont-btn-resert">
+                
+            </div>
+        </div>
+        <div id="cta" class="cont-cta">
+            <p class="p-cta">Ahora que ya tienes una idea más clara de tu presupuesto, te invitamos a conocer nuestra calculadora "<a class="a-cta" href="https://tyba.com.co/herramientas/cal-invertir-para-el-mundial/">invierte para ir al mundial</a>" y vive la emoción del fútbol.</p>
+        </div>
+    </div>
+            
+    <script>
+        // Formatear números con separadores de miles
+        function formatNumber(input) {
+            let value = input.value.replace(/\D/g, "");
+            input.value = new Intl.NumberFormat('es-ES').format(value);
+        }
+
+        // Función para añadir nuevos inputs
+        document.getElementById('add-input').addEventListener('click', function () {
+            const container = document.getElementById('new-inputs-container');
+            const newInputGroup = document.createElement('div');
+            newInputGroup.classList.add('input-group');
+            newInputGroup.classList.add('input-group2');
+
+            const label = document.createElement('label');
+            label.textContent = 'Nuevo gasto';
+            const inputText = document.createElement('input');
+            inputText.type = 'text';
+            inputText.placeholder = 'Nombre del gasto';
+
+            const inputNumber = document.createElement('input');
+            inputNumber.type = 'text';
+            inputNumber.classList.add('number-input');
+            inputNumber.placeholder = 'Valor nuevo gasto';
+            inputNumber.oninput = function () {
+                formatNumber(inputNumber);
+            };
+
+            newInputGroup.appendChild(inputText);
+            newInputGroup.appendChild(inputNumber);
+            container.appendChild(newInputGroup);
+        });
+
+        // Función para calcular el presupuesto total
+        document.getElementById('calculate-button').addEventListener('click', function () {
+            let total = 0;
+            const inputs = document.querySelectorAll('.number-input');
+            inputs.forEach(input => {
+                let value = input.value.replace(/\./g, '');
+                total += Number(value) || 0;
+            });
+            document.getElementById('result').textContent = `Total: ${new Intl.NumberFormat('es-ES').format(total)}`;
+
+            // Mostrar el botón de "Nuevo presupuesto" después de calcular el primer presupuesto
+            document.getElementById('reset-button').style.display = 'block';
+            document.getElementById('cta').style.display = 'block';
+            cta.scrollIntoView({ behavior: 'smooth', block:'end' });
+        });
+
+        // Función para reiniciar el formulario a su estado original
+        document.getElementById('reset-button').addEventListener('click', function () {
+            // Reiniciar los valores de los inputs predeterminados a 0
+            const defaultInputs = ['tiquetes', 'hotel', 'entradas', 'comida', 'transporte', 'turismo'];
+            defaultInputs.forEach(id => {
+                const input = document.getElementById(id);
+                input.value = '0';
+            });
+
+            // Eliminar los inputs adicionales creados
+            const newInputsContainer = document.getElementById('new-inputs-container');
+            newInputsContainer.innerHTML = '';
+
+            // Reiniciar el resultado a 0
+            document.getElementById('result').textContent = 'Total: $0';
+
+            // Ocultar el botón de "Nuevo presupuesto" nuevamente
+            document.getElementById('reset-button').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

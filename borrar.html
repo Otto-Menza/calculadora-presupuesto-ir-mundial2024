@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <title>Calculadora de Presupuesto</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <h3 class="tittle-cal">Calculadora de Presupuesto</h3>
+    <div class="cont-container">
+        <div class="container">
+            
+            <div class="input-container" id="input-container">
+                <div class="input-group">
+                    <label for="tiquetes">Tiquetes</label>
+                    <input type="text" id="tiquetes" class="number-input" placeholder="0" oninput="formatNumber(this)">
+                </div>
+                <div class="input-group">
+                    <label for="hotel">Hotel</label>
+                    <input type="text" id="hotel" class="number-input" placeholder="0" oninput="formatNumber(this)">
+                </div>
+                <div class="input-group">
+                    <label for="entradas">Entradas</label>
+                    <input type="text" id="entradas" class="number-input" placeholder="0" oninput="formatNumber(this)">
+                </div>
+            </div>
+            <div class="cont-new-input">
+                <button class="btn btn1" id="add-input">Añadir nuevo gasto</button>
+                <div id="new-inputs-container"></div>
+            </div>
+            <div class="cont-calcular">
+                <button class="btn btn2" id="calculate-button">Calcular Presupuesto</button>
+                <div id="result">Total: $0</div>
+                <button class="btn btn-resert" id="reset-button" style="display: none;">Nuevo presupuesto</button>
+            </div>
+        </div>
+        <div class="container2" id="resultados">
+            <div class="container-contentMain" id="main-content">
+                <h2>Calcula para ir<br>al mundial</h2>
+                <img src="https://tyba.com.co/herramientas/wp-content/uploads/2024/07/tools-2.png" alt="Icono clic">
+                <ul>
+                    <li>Ten cuenta que necesitas un aproximado de la cantidad de dinero que puedes gastar.</li>
+                    <li>Entre más rápido empieces a ahorrar más rentabilidad vas a obtener.</li>
+                    <li>Nuestros Fondos de Inversión son variados, conócelos todos <a href="https://tyba.com.co/herramientas/sqi/" target="_blank">aquí.</a></li>
+                </ul> 
+            </div>
+            <div id="new-result-container" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Función para formatear números con separadores de miles
+        function formatNumber(input) {
+            let value = input.value.replace(/\D/g, "");
+            input.value = new Intl.NumberFormat('es-ES').format(value);
+        }
+
+        // Función para añadir nuevos inputs
+        document.getElementById('add-input').addEventListener('click', function () {
+            const container = document.getElementById('new-inputs-container');
+            const newInputGroup = document.createElement('div');
+            newInputGroup.classList.add('input-group');
+            newInputGroup.classList.add('input-group2');
+
+            const label = document.createElement('label');
+            label.textContent = 'Nuevo gasto';
+            const inputText = document.createElement('input');
+            inputText.type = 'text';
+            inputText.placeholder = 'Nombre del gasto';
+
+            const inputNumber = document.createElement('input');
+            inputNumber.type = 'text';
+            inputNumber.classList.add('number-input');
+            inputNumber.placeholder = '0';
+            inputNumber.oninput = function () {
+                formatNumber(inputNumber);
+            };
+
+            newInputGroup.appendChild(inputText);
+            newInputGroup.appendChild(inputNumber);
+            container.appendChild(newInputGroup);
+        });
+
+        // Función para obtener el próximo mes
+        function getNextMonth() {
+            const currentDate = new Date();
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            return monthNames[currentDate.getMonth()];
+        }
+
+        // Calcular la cantidad de meses hasta mayo de 2026
+        function getMonthsUntilMay2026() {
+            const currentDate = new Date();
+            const targetDate = new Date(2026, 4); // Mayo 2026 (mes 4 porque es basado en cero)
+            const diffTime = targetDate - currentDate;
+            const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
+            return diffMonths;
+        }
+
+        // Función para calcular presupuesto total
+        document.getElementById('calculate-button').addEventListener('click', function () {
+            let total = 0;
+            const inputs = document.querySelectorAll('.number-input');
+            inputs.forEach(input => {
+                let value = input.value.replace(/\./g, '');
+                total += Number(value) || 0;
+            });
+            document.getElementById('result').textContent = `Total: $${new Intl.NumberFormat('es-ES').format(total)}`;
+
+            // Mostrar el nuevo contenedor con los cálculos
+            const containerMain = document.getElementById('main-content');
+            const newResultContainer = document.getElementById('new-result-container');
+            containerMain.style.display = 'none';
+            newResultContainer.style.display = 'block';
+
+            // Calcular valores
+            const nextMonth = getNextMonth();
+            const monthsUntilMay2026 = getMonthsUntilMay2026();
+            const inversionMensual = Math.ceil(total / monthsUntilMay2026);
+            
+            // Crear el contenido dinámico para el nuevo contenedor
+            newResultContainer.innerHTML = `
+                <p>Invirtiendo desde el siguiente mes (${nextMonth}) podrás llegar a la meta con:</p>
+                <h3>Sin invertir en tyba, ahorrando debajo del colchón</h3>
+                <table>
+                    <tr><td>Inversión mensual:</td><td>$${new Intl.NumberFormat('es-ES').format(inversionMensual)}</td></tr>
+                    <tr><td>Cantidad de meses:</td><td>${monthsUntilMay2026}</td></tr>
+                    <tr><td>Total ahorrado:</td><td>$${new Intl.NumberFormat('es-ES').format(inversionMensual * monthsUntilMay2026)}</td></tr>
+                </table>
+                
+            `;
+
+            // Llamada a la API para obtener el fondo de riesgo medio con mayor rentabilidad
+            async function obtenerFondoMedio() {
+                try {
+                    const response = await fetch('https://tyba.io/api-qa/robo-advisor/portfolios/sqi?product=STARK');
+                    const data = await response.json();
+
+                    // Filtrar el fondo de riesgo medio con el mayor expectedProfitability
+                    const fondoMedio = data.filter(fondo => fondo.riskLevel.toLowerCase() === 'medio')
+                                        .sort((a, b) => b.expectedProfitability - a.expectedProfitability)[0];
+
+                    if (fondoMedio) {
+                        const profitAnual = fondoMedio.expectedProfitability;
+
+                        // Calcular los valores basados en la rentabilidad
+                        const inversionMensualTyba = Math.ceil(total / (1 + (profitAnual / 100)) ** (monthsUntilMay2026 / 12));
+                        const capitalInvertido = inversionMensualTyba * monthsUntilMay2026;
+                        const capitalMasInteres = capitalInvertido * (1 + (profitAnual / 100)) ** (monthsUntilMay2026 / 12);
+
+                        // Insertar los datos en la tabla
+                        const tybaTable = document.getElementById('tyba-table');
+                        if (tybaTable) { // Verificar que el contenedor exista
+                            tybaTable.innerHTML = `
+                            <h3>Invertir en tyba en uno de nuestros fondos de riesgo medio</h3>
+                            <table id="tyba-table">
+                                <tr><td>Inversión mensual:</td><td>$${new Intl.NumberFormat('es-ES').format(inversionMensualTyba)}</td></tr>
+                                <tr><td>Cantidad de meses:</td><td>${monthsUntilMay2026}</td></tr>
+                                <tr><td>Capital invertido:</td><td>$${new Intl.NumberFormat('es-ES').format(capitalInvertido)}</td></tr>
+                                <tr><td>Capital más intereses:</td><td>$${new Intl.NumberFormat('es-ES').format(capitalMasInteres)}</td></tr>
+                                <tr><td>Interés anual:</td><td>${profitAnual}%</td></tr>
+                            </table>
+                                
+                            `;
+                        } else {
+                            console.error("El contenedor de la tabla no existe");
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Error al obtener el fondo de inversión medio:', error);
+                }
+            }
+
+            // Llamar a la función para obtener y mostrar los fondos
+            obtenerFondoMedio();
+
+            // Mostrar el botón de "Nuevo presupuesto"
+            document.getElementById('reset-button').style.display = 'block';
+        });
+
+        // Función para reiniciar el formulario a su estado original
+        document.getElementById('reset-button').addEventListener('click', function () {
+            // Si 'input-container' no es un formulario, restablece manualmente los campos
+            const inputs = document.querySelectorAll('.number-input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            document.getElementById('result').textContent = 'Total: $0';
+            document.getElementById('new-inputs-container').innerHTML = '';
+            document.getElementById('reset-button').style.display = 'none';
+
+            // Ocultar el nuevo resultado y mostrar el contenido original
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('new-result-container').style.display = 'none';
+        });
+
+    </script>
+</body>
+
+</html>
